@@ -121,12 +121,6 @@ char **argv;
   }
 
   if (flagremote) {
-    int on;
-    on = 1;
-    if (ioctl(4,TIOCREMOTE,&on) == -1) {
-      substdio_putsflush(subfderr,"ptyio: fatal: unable to set remote mode\n");
-      _exit(111);
-    }
     ttymodes_makeraw(&tminit);
   }
 

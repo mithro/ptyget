@@ -20,26 +20,23 @@
 
 #include <sys/sysmacros.h>
 #include <sys/stropts.h>
-#include <sys/stream.h>
-#include <sys/ptms.h>
 
 char fnslave[10 + FMT_ULONG]; /* 10 for /dev/pts/ */
 
 char *pty45()
 {
-  struct strioctl si;
-  struct stat st;
   int fd;
+  unsigned int slave;
   char *s;
 
   fd = open("/dev/ptmx",O_RDWR | O_NDELAY);
   if (fd == -1) return 0;
   if (fdmove(4,fd) == -1) return 0;
 
-  if (fstat(4,&st) == -1) return 0;
+  if (ioctl(4, TIOCGPTN, &slave) != 0) return 0;
   s = fnslave;
   s += fmt_str(s,"/dev/pts/");
-  s += fmt_ulong(s,(unsigned long) minor(st.st_rdev));
+  s += fmt_ulong(s,(unsigned long) slave);
   *s = 0;
 
 #ifdef PTYGET_SECURE
@@ -49,18 +46,17 @@ char *pty45()
     return 0;
 #endif
 
-  si.ic_cmd = UNLKPT;
-  si.ic_timout = 0;
-  si.ic_len = 0;
-  si.ic_dp = 0;
-  if (ioctl(4,I_STR,&si) == -1) return 0;
+  {
+    int unlock=0;
+    if (ioctl(4,TIOCSPTLCK,&unlock) != 0)
+      /*if (errno != EINVAL)*/
+        return 0;
+  }
 
   fd = open(fnslave,O_RDWR | O_NOCTTY);
   if (fd == -1) return 0;
   if (fdmove(5,fd) == -1) return 0;
 
-  if (ioctl(5,I_PUSH,"ptem") == -1) return 0;
-  if (ioctl(5,I_PUSH,"ldterm") == -1) return 0;
   if (tcflush(5,TCIOFLUSH) == -1) return 0;
 
   return fnslave;

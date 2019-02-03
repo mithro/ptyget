@@ -1,5 +1,6 @@
 #include <sys/types.h>
 #include <sys/ioctl.h>
+#include <unistd.h>
 #include "error.h"
 #include <termios.h>
 #include "ttymodes.h"
