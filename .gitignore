@@ -1,0 +1,33 @@
+# Build outputs
+*.o
+*.a
+*.0
+
+# Random crap from custom build system
+compile
+find-systype
+home
+load
+make-commands
+makelib
+systype
+fork.h
+hasptc.h
+hasptmx.h
+hassgact.h
+hassgprm.h
+haswaitp.h
+
+# Actual tools
+background
+excloff
+exclon
+nobuf
+ptybandage
+ptybandage
+ptyget
+ptyio
+ptyrun
+ptyspawn
+select.h
+ttydetach
